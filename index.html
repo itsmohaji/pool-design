@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>LIJBAILAT Pool 3D Design Studio</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#111;font-family:Arial,sans-serif;color:#fff}canvas{display:block}
+.ui{position:fixed;z-index:5;background:rgba(15,18,24,.78);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.14);border-radius:16px;box-shadow:0 12px 35px rgba(0,0,0,.35)}
+#intro{left:14px;top:14px;width:min(390px,calc(100vw - 28px));padding:16px}h1{font-size:18px;margin:0 0 8px}p{font-size:13px;line-height:1.45;color:#d8dde6;margin:0 0 12px}
+button,select{border:0;border-radius:10px;padding:10px 12px;font-weight:700;margin:3px;background:#fff;color:#111}button.alt{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.16)}
+#studio{right:14px;top:14px;width:255px;padding:12px}.row{margin-bottom:8px}.row label{display:block;font-size:11px;color:#bbc3ce;margin:0 0 4px}.row select{width:100%;margin:0;background:#fff}
+#mobile{position:fixed;left:16px;bottom:16px;z-index:6;display:none}.pad{display:grid;grid-template-columns:56px 56px 56px;gap:6px}.pad button{width:56px;height:56px;background:rgba(20,25,32,.78);color:#fff;border:1px solid rgba(255,255,255,.18);font-size:20px}
+#hint{left:14px;bottom:14px;padding:9px 12px;font-size:12px;color:#d8dde6}
+@media(max-width:760px){#studio{top:auto;bottom:14px;right:14px;width:185px;max-height:48vh;overflow:auto}#intro{width:calc(100vw - 28px)}#hint{display:none}#mobile{display:block}}
+</style>
+</head>
+<body>
+<div id="intro" class="ui"><h1>LIJBAILAT Pool — 3D Design Studio</h1><p>Drag to look around. Use WASD/arrow keys on desktop or the touch controls on mobile. Change materials, furniture style and atmosphere from the design panel.</p><button id="start">Enter Walk Mode</button><button id="hide" class="alt">Hide</button></div>
+<div id="studio" class="ui">
+  <div class="row"><label>Deck</label><select id="deck"><option value="travertine">Travertine</option><option value="limestone">Limestone</option><option value="wood">Wood</option></select></div>
+  <div class="row"><label>Pool Water</label><select id="pool"><option value="aqua">Aqua</option><option value="deep">Deep Blue</option><option value="emerald">Emerald</option></select></div>
+  <div class="row"><label>Wall</label><select id="wall"><option value="ivory">Ivory</option><option value="greige">Greige</option><option value="charcoal">Charcoal</option></select></div>
+  <div class="row"><label>Furniture</label><select id="furniture"><option value="resort">Resort</option><option value="minimal">Minimal</option><option value="warm">Warm</option></select></div>
+  <div class="row"><label>Atmosphere</label><select id="time"><option value="day">Day</option><option value="sunset">Sunset</option><option value="night">Night</option></select></div>
+  <button id="lights" class="alt">Toggle Lights</button><button id="reset" class="alt">Reset View</button><button id="shot" class="alt">Save Image</button>
+</div>
+<div id="hint" class="ui">WASD / arrows to walk · drag to look · shift = faster</div>
+<div id="mobile"><div class="pad"><span></span><button data-m="f">▲</button><span></span><button data-m="l">◀</button><button data-m="b">▼</button><button data-m="r">▶</button></div></div>
+<script src="three.min.js"></script>
+<script>
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xbfd7e6);scene.fog=new THREE.Fog(0xbfd7e6,38,90);
+const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.1,250);camera.position.set(11,1.72,10);
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;document.body.appendChild(renderer.domElement);
+const hemi=new THREE.HemisphereLight(0xeaf6ff,0x575c50,1.7);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffefd5,2.5);sun.position.set(-15,28,8);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-35;sun.shadow.camera.right=35;sun.shadow.camera.top=35;sun.shadow.camera.bottom=-35;scene.add(sun);
+const M=(c,r=.8,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+function box(x,y,z,w,h,d,mat){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
+const ground=box(0,-.12,0,58,.24,48,M(0xc8c0b4,.95));
+const villaMat=M(0xe9e3d8,.9),wallMat=M(0x9a9a94,.9),deckMat=M(0xb7aa96,.92),furnMat=M(0xe1ddd5,.95);
+box(20,4,1,10,8,34,villaMat);for(let z=-11;z<=12;z+=5.6)box(14.92,2.7,z,.12,3.3,3.1,M(0x26363e,.18,.05));
+const shape=new THREE.Shape();shape.moveTo(-13,-10);shape.lineTo(7,-10);shape.lineTo(7,10);shape.closePath();const shellG=new THREE.ExtrudeGeometry(shape,{depth:.35,bevelEnabled:false});shellG.rotateX(-Math.PI/2);const shell=new THREE.Mesh(shellG,M(0xd4d8d8,.5));shell.position.y=.05;shell.receiveShadow=true;scene.add(shell);
+const ws=new THREE.Shape();ws.moveTo(-11.9,-9);ws.lineTo(5.8,-9);ws.lineTo(5.8,8.5);ws.closePath();const wg=new THREE.ShapeGeometry(ws);wg.rotateX(-Math.PI/2);const waterMat=new THREE.MeshPhysicalMaterial({color:0x27cbe0,roughness:.08,metalness:.02,transparent:true,opacity:.9,clearcoat:1});const water=new THREE.Mesh(wg,waterMat);water.position.y=.25;scene.add(water);
+box(-2.7,.3,-10.15,21.2,.28,.55,M(0xa6a39c,.9));box(7.15,.3,.05,.55,.28,20.7,M(0xa6a39c,.9));const diag=box(-3.1,.3,0,.55,.28,28.3,M(0xa6a39c,.9));diag.rotation.y=-Math.PI/4;
+const deck=box(10,.02,0,5.5,.18,27,deckMat);const d2=box(-2.6,.015,-12.2,22,.16,3.7,deckMat);const wallD=box(-5.7,1.05,.1,.35,2.1,31.5,wallMat);wallD.rotation.y=-Math.PI/4;box(-.5,1.05,-14,.35,2.1,24,wallMat);box(8.3,1.05,12.5,.35,2.1,7,wallMat);
+function plant(x,z,s=.7){box(x,.55*s,z,.23*s,1.1*s,.23*s,M(0x6a4b2e,.95));const c=new THREE.Mesh(new THREE.SphereGeometry(.8*s,16,12),M(0x3c7042,.9));c.position.set(x,1.45*s,z);c.castShadow=true;scene.add(c)}for(let i=0;i<10;i++)plant(-13+i*2.25,-12.7);for(let i=0;i<7;i++)plant(8.1,11-i*3.2,.62);
+const furniture=[];function fbox(x,y,z,w,h,d){const o=box(x,y,z,w,h,d,furnMat);furniture.push(o);return o}fbox(11.5,.65,7.4,3.7,1,1.25);fbox(11.5,1.15,7.95,3.7,1,.3);fbox(10.8,.52,5.7,2.1,.16,1.15);fbox(9.35,.55,4.7,1.15,.85,1.15);fbox(12.25,.55,4.7,1.15,.85,1.15);fbox(3.2,.42,-5.7,2.2,.3,.75);fbox(4.6,.42,-4.2,2.2,.3,.75);
+const bulbs=[];for(const z of [-10,-4,2,8]){const l=new THREE.PointLight(0xffbd78,0,8,2);l.position.set(14.2,2.7,z);scene.add(l);bulbs.push(l);box(14.35,2.7,z,.18,.5,.35,M(0x242424,.35,.4))}
+let yaw=-2.5,pitch=-.08,drag=false,lastX=0,lastY=0;function applyLook(){camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch}applyLook();renderer.domElement.addEventListener('pointerdown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(!drag)return;yaw-=(e.clientX-lastX)*.004;pitch-=(e.clientY-lastY)*.004;pitch=Math.max(-1.35,Math.min(1.35,pitch));lastX=e.clientX;lastY=e.clientY;applyLook()});renderer.domElement.addEventListener('pointerup',()=>drag=false);
+const keys={};addEventListener('keydown',e=>keys[e.code]=true);addEventListener('keyup',e=>keys[e.code]=false);const mobile={f:false,b:false,l:false,r:false};document.querySelectorAll('[data-m]').forEach(b=>{const k=b.dataset.m;['pointerdown','touchstart'].forEach(ev=>b.addEventListener(ev,e=>{e.preventDefault();mobile[k]=true}));['pointerup','pointercancel','touchend'].forEach(ev=>b.addEventListener(ev,e=>{e.preventDefault();mobile[k]=false}))});
+let prev=performance.now();function move(dt){const forward=Number(keys.KeyW||keys.ArrowUp||mobile.f)-Number(keys.KeyS||keys.ArrowDown||mobile.b);const side=Number(keys.KeyD||keys.ArrowRight||mobile.r)-Number(keys.KeyA||keys.ArrowLeft||mobile.l);const speed=(keys.ShiftLeft||keys.ShiftRight)?8:4.2;const fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);camera.position.x+=(fx*forward+rx*side)*speed*dt;camera.position.z+=(fz*forward+rz*side)*speed*dt;camera.position.x=Math.max(-13.5,Math.min(14,camera.position.x));camera.position.z=Math.max(-13,Math.min(13,camera.position.z));camera.position.y=1.72}
+function setAtmos(v){if(v==='day'){scene.background.set(0xbfd7e6);scene.fog.color.set(0xbfd7e6);sun.intensity=2.5;hemi.intensity=1.7;renderer.toneMappingExposure=1.05}else if(v==='sunset'){scene.background.set(0xf0a978);scene.fog.color.set(0xf0a978);sun.color.set(0xffb36b);sun.intensity=1.8;hemi.intensity=1.1;renderer.toneMappingExposure=1}else{scene.background.set(0x07111f);scene.fog.color.set(0x07111f);sun.intensity=.18;hemi.intensity=.35;renderer.toneMappingExposure=.72;bulbs.forEach(l=>l.intensity=2.4)}}
+document.getElementById('deck').onchange=e=>{const v=e.target.value,c=v==='wood'?0x8a6544:v==='limestone'?0xd0cbc0:0xb7aa96;deckMat.color.set(c)};document.getElementById('pool').onchange=e=>waterMat.color.set(e.target.value==='deep'?0x1667a8:e.target.value==='emerald'?0x2e9d83:0x27cbe0);document.getElementById('wall').onchange=e=>{const c=e.target.value==='charcoal'?0x44474d:e.target.value==='greige'?0xa8a096:0x9a9a94;wallMat.color.set(c);villaMat.color.set(e.target.value==='charcoal'?0x64676d:e.target.value==='greige'?0xc8bfb4:0xe9e3d8)};document.getElementById('furniture').onchange=e=>furnMat.color.set(e.target.value==='minimal'?0xd7d9dc:e.target.value==='warm'?0xb78d67:0xe1ddd5);document.getElementById('time').onchange=e=>setAtmos(e.target.value);let lights=false;document.getElementById('lights').onclick=()=>{lights=!lights;bulbs.forEach(l=>l.intensity=lights?2.4:0)};document.getElementById('reset').onclick=()=>{camera.position.set(11,1.72,10);yaw=-2.5;pitch=-.08;applyLook()};document.getElementById('shot').onclick=()=>{renderer.render(scene,camera);const a=document.createElement('a');a.download='LIJBAILAT-pool-view.png';a.href=renderer.domElement.toDataURL('image/png');a.click()};document.getElementById('hide').onclick=()=>document.getElementById('intro').style.display='none';document.getElementById('start').onclick=()=>document.getElementById('intro').style.display='none';
+function animate(t){requestAnimationFrame(animate);const dt=Math.min(.05,(t-prev)/1000);prev=t;move(dt);water.position.y=.25+Math.sin(t*.0014)*.012;renderer.render(scene,camera)}requestAnimationFrame(animate);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body></html>
