@@ -15,9 +15,9 @@ type DesignState = {
 
 const defaults = {
   water: "#58aeb3",
-  stone: "#d6c3a4",
-  fabric: "#8b7867",
-  atmosphere: "golden" as Atmosphere,
+  stone: "#c8c2b7",
+  fabric: "#c4b4a4",
+  atmosphere: "morning" as Atmosphere,
   collection: "contemporary" as Collection,
 };
 

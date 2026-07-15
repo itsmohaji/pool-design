@@ -20,15 +20,17 @@ Open `http://localhost:3000`.
 
 ## Measurement status
 
-The uploaded PDF contains small AutoCAD annotations that are not all reliably legible in the rasterized export. All unconfirmed dimensions are intentionally isolated in `src/config/project.ts`. They must be checked against the original DWG or a dimension schedule before construction-level sign-off. The current scene is an architectural visualization, not a construction document.
+The uploaded PDF contains small AutoCAD annotations that are not all reliably legible in the rasterized export. All critical and assumed dimensions are intentionally isolated in `src/config/geometry.ts`. They must be checked against the original DWG or a dimension schedule before construction-level sign-off. The current scene is an architectural visualization, not a construction document.
 
 ## Current functional scope
 
 - Responsive cinematic introduction
 - Accurate tapered pool design based on the plan silhouette
 - Pool, coping, steps, terrace, landscaping and photographed lounge reconstruction
+- Reference-matched double tanning daybed and fringed woven umbrella
+- Original high-resolution limestone, plaster, textile and walnut texture maps
 - Real-time water, stone, upholstery, furniture-direction and atmosphere controls
-- Curated camera targets
+- Aerial and human-eye camera modes, WASD/arrow walking, mobile walk controls and pool collision
 - Local design persistence and URL sharing
 - Clean PNG capture from the WebGL canvas
 - Desktop and mobile responsive interface
@@ -39,4 +41,4 @@ The scene uses original procedural geometry and materials, so it does not ship u
 
 ## Deployment
 
-Import the repository into Vercel and deploy with the default Next.js settings, or run `npm run build && npm start` on a Node.js VPS. No environment variables are required.
+GitHub Pages deploys automatically from `.github/workflows/deploy-pages.yml` after a push to `main`. The public path is configured through `GITHUB_PAGES=true`, including direct refresh and relative texture loading.
